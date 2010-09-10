@@ -25,15 +25,15 @@ if [ ! -d "${dest}" ]; then
 fi
 
 if [ ! -d "${dest}/cur" ]; then
-  btrfsctl -S cur "${dest}"
-fi || true
+  btrfs subvolume create "${dest}/cur"
+fi
 
 logopt=""
 if [ -d /var/log/btr-backup ]; then
   logopt="--log-file=/var/log/btr-backup/rsync${target////_}.log"
-fi || true
+fi
 
 rsync -acSHXA --numeric-ids --del $logopt \
 	"$@" "${target}/" "${dest}/cur/"
-btrfsctl -c "${dest}/cur" >/dev/null || true
-btrfsctl -s "${dest}/$(date +%Y-%m-%dT%H:%M:%S)" "${dest}/cur" > /dev/null || true
+btrfs filesystem sync "${dest}/cur" > /dev/null
+btrfs subvolume snapshot "${dest}/cur" "${dest}/$(date +%Y-%m-%dT%H:%M:%S)" > /dev/null
