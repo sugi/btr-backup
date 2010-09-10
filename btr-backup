@@ -2,6 +2,8 @@
 set -e
 
 backup_base=/backup
+logdir=/var/log/btr-backup
+
 target="${1%/}"
 shift
 
@@ -15,25 +17,42 @@ fi
 dest="${dest////_}"
 dest="${backup_base}/${host}/${dest#_}"
 
+logfile="${logdir}/backup${target////_}.log"
+
+function logstamp {
+  echo -n "`date '+%Y/%m/%d %H:%M:%S'` " >> $logfile
+}
+function logmsg {
+  echo "`date '+%Y/%m/%d %H:%M:%S'` $@" >> $logfile
+}
+
 if [ -z "${target}" ]; then
   echo "Usage: $0 <target_dir> [rsync-options]" >&2
   exit 255
 fi
 
+if [ -d $logdir ]; then
+  mkdir -p "${logdir}"
+fi
+
+logmsg "Backup start: ${target} -> ${dest}"
+
 if [ ! -d "${dest}" ]; then
+  logmsg "Create destdir '${dest}'"
   mkdir -p "${dest}"
 fi
 
 if [ ! -d "${dest}/cur" ]; then
-  btrfs subvolume create "${dest}/cur"
+  logstamp
+  btrfs subvolume create "${dest}/cur" >> $logfile
 fi
 
-logopt=""
-if [ -d /var/log/btr-backup ]; then
-  logopt="--log-file=/var/log/btr-backup/rsync${target////_}.log"
-fi
-
-rsync -acSHXA --numeric-ids --del $logopt \
+logmsg "Run rsync with: -acSHXA --numeric-ids --del --log-file=${logfile} $@ ${target}/ ${dest}/cur/"
+rsync -acSHXA --numeric-ids --del --log-file=${logfile} \
 	"$@" "${target}/" "${dest}/cur/"
-btrfs filesystem sync "${dest}/cur" > /dev/null
-btrfs subvolume snapshot "${dest}/cur" "${dest}/$(date +%Y-%m-%dT%H:%M:%S)" > /dev/null
+
+logstamp
+btrfs filesystem sync "${dest}/cur" >> $logfile
+
+logstamp
+btrfs subvolume snapshot "${dest}/cur" "${dest}/$(date +%Y-%m-%dT%H:%M:%S)" >> $logfile
