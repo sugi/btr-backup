@@ -1,0 +1,166 @@
+#!/usr/bin/ruby
+#
+# btr-backup-clean: cleanup old backup directory for btr-backup
+#
+# Usage:
+#   btr-backup-clean <backup directories...>
+#
+# This script was forked from hlbackup-clean;
+# http://hlbackup.sourceforge.jp/
+#
+# Copyright(C) 2003 Taku YASUI <tach@debian.or.jp>,
+# Copyright(C) 2010 Tatsuki Sugiura <sugi@nemui.org>, All rights reserved.
+# This is free software with ABSOLUTELY NO WARRANTY.
+#
+# You can redistribute it and/or modify it under the terms of 
+# the GNU General Public License version 2.
+#
+# 2010-09-20:
+# Modified for btr-backup by Tatsuki Sugiura <sugi@nemui.org>
+#
+
+require 'getoptlong'
+require 'date'
+
+NAME = 'btr-backup-clean'
+VERS = '0.0.1'
+DEFAULT = { 'year' => 2,
+	    'month' => 6,
+	    'week' => 6,
+	    'day' => 7 }
+
+def parse_options
+  options = Hash.new
+  parser = GetoptLong.new
+  parser.set_options(['--help',          '-h', GetoptLong::NO_ARGUMENT],
+		     ['--no-act',	 '-n', GetoptLong::NO_ARGUMENT],
+		     ['--verbose',	 '-v', GetoptLong::NO_ARGUMENT],
+		     ['--version',	 '-V', GetoptLong::NO_ARGUMENT],
+		     ['--keep',		 '-k', GetoptLong::REQUIRED_ARGUMENT])
+  parser.each_option {|name, arg|
+    options[name.sub(/^--/, "")] = arg
+  }
+  show_version if options['version']
+  show_usage if options['help'] or ARGV[0].nil?
+  return options
+end
+
+def parse_keep(keep)
+  ch_tables = { 'year' => /(\d+)Y/,
+  		'month' => /(\d+)M/,
+		'week' => /(\d+)W/,
+		'day' => /(\d+)D/ }
+  ret = {}
+  ch_tables.each do |key, regex|
+    ret[key] = DEFAULT[key]
+    ret[key] = $1.to_i if ( regex.match(keep) )
+    ret[key] -= 1
+  end
+  return ret
+end
+
+def create_keepdirs(keep)
+  nowdate = Date.new(Time.now.year, Time.now.month, Time.now.day)
+  ret = {}
+  # year
+  keep['year'].downto(0) do |i|
+    (ret["#{Time.now.year-i}-01-01"] ||= []) << :Yearly
+  end
+  # month  
+  keep['month'].downto(0) do |i|
+    date = nowdate << i
+    (ret["#{date.year}-#{sprintf("%02d", date.month)}-01"] ||= []) << :Monthly
+  end
+  # week
+  keep['week'].downto(0) do |i|
+  date = nowdate - nowdate.cwday - 7 * i
+    (ret["#{date.year}-#{sprintf("%02d", date.month)}-#{sprintf("%02d", date.day)}"] ||= []) << :Weekly
+  end
+  # day
+  keep['day'].downto(0) do |i|
+    date = nowdate - i
+    (ret[("#{date.year}-#{sprintf("%02d", date.month)}-#{sprintf("%02d", date.day)}")] ||= []) << :Daily
+  end
+  ret
+end 
+
+def show_usage
+  print <<_EOT
+Usage: #{NAME} [OPTIONS] directories...
+OPTIONS:
+  --help,              -h: show this help
+  --keep KEEPARGS,     -k: use KEEPARGS to decide delete directories
+  --no-act,            -n: run command but don't do it
+  --verbose,           -v: verbose output
+  --version,           -V: show software version
+
+KEEPARGS: [digitY][digitM][digitW][digitD]
+  e.g. --keep 2Y6M6W7D (2years, 6months, 6weeks, 7days, default)
+_EOT
+  exit
+end
+
+def show_version
+  print <<_EOT
+#{NAME} version #{VERS}
+Copyright (C) 2003 Taku YASUI <tach@debian.or.jp>
+Copyright (C) 2010 Tatsuki Sugiura <sugi@nemui.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+_EOT
+  exit
+end
+
+def main
+
+  opts = parse_options
+  keepdirs = create_keepdirs(parse_keep(opts['keep']))
+
+  # lower priority
+  Process.setpriority(Process::PRIO_PROCESS, $$, 19)
+  begin
+    system('ionice', '-c3', "-p#{$$}")
+  rescue
+    # ignore
+  end
+
+  ARGV.each do |basedir|
+    keeped = []
+    Dir.glob("#{basedir}/[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]").sort.each do |dir|
+      next if ( ! File.directory?(dir) )
+      if File.stat(dir).ino != 256
+	$stderr.puts "Skip: '#{dir}' seems not snapshot."
+	next
+      end
+      daykey = dir[(basedir.length+1)..(basedir.length+10)]
+      if keepdirs.has_key? daykey
+        keeped.push [dir, keepdirs[daykey]]
+        next
+      end
+      puts "Deleting #{dir}" if opts['verbose'] && opts['no-act']
+      args = ['btrfs', 'subvolume', 'delete', "'"+dir.gsub(/'/, %q{\'})+"'"]
+      args << "> /dev/null" unless opts['verbose']
+      begin
+	system(args.join(' ')) unless opts['no-act']
+      rescue => e
+	$stderr.puts "btrfs command execution failed: #{e.inspect}"
+	next
+      end
+      if !opts['no-act'] && ($? >> 8) != 0
+	$stderr.puts "btrfs has been exited with error: #{$?>>8}"
+      end
+    end
+    if opts['verbose']
+      puts "Keep dirs on #{basedir}:"
+      keeped.each do |dir|
+        puts "#{dir[0]} (#{dir[1].join(', ').to_s})"
+      end
+    end
+  end
+
+end
+
+main if __FILE__ == $0
