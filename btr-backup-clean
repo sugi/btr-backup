@@ -150,7 +150,7 @@ def main
 	next
       end
       if !opts['no-act'] && ($? >> 8) != 0
-	$stderr.puts "btrfs has been exited with error: #{$?>>8}"
+	$stderr.puts "btrfs has been exited with error=#{$?>>8} on #{dir}"
       end
     end
     if opts['verbose']
