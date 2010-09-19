@@ -1,0 +1,116 @@
+btr-backup - backup script on btrfs
+=================================
+
+http://github.com/sugi/btr-backup
+
+btr-backup is a simple script to backup files on btrfs.
+btrfs is really usefull for backup with features cow and compress.
+
+== Requirements ==
+
+  * Backup host
+    ** btrfs v2.6.32 above
+    ** "btrfs" command (from 2010-01-24 on git)
+    ** rsync
+    ** ruby (for btrfs-clean)
+    ** (ssh for remote backup)
+  * Backup target
+    ** rsync
+    ** (sshd or rsyncd)
+
+== SYNOPSIS ==
+
+-------------
+btr-backup <target_dir> [--rsync_options]
+-------------
+
+target_dir::
+	directory name or rsync style remote host. (e.g. /etc, remote:/var)
+rsync_options::
+	all arguments after *target_dir* will passed to rsync. (e.g. -x --exclude=/var/log)
+
+== Description ==
+
+*btr-backup* create backup to */backup/TARGET_HOST/TARGET_DIR*. 
+Backup steps are;
+
+  . (create subvolume on /backup/TARGET_HOST/TARGET_DIR/cur)
+  . run rsync to copy files to /backup/TARGET_HOST/TARGET_DIR/cur
+  . snapshot from cur to YYYY-MM-DDTHH:MM:SS
+
+And backup process is logged into */var/log/btr-backup/*.
+
+== Example ==
+
+Simple one. That backups /etc to /backup/myhost/etc/;
+
+-------------
+btr-backup /etc
+-------------
+
+Backup root filesystem of remote host 'mygw' with transfer compression;
+
+-------------
+btr-backup mygw:/ -xz
+-------------
+
+Backup /var without /var/cache/* and /var/tmp/*;
+
+-------------
+btr-backup /var --exclude="/cache/*" --exclude="/tmp/*"
+-------------
+
+== Cleanup backup ==
+
+=== By Hand ===
+
+You can delete backup directory with "btrfs subvolume delete", like;
+
+-------------
+ btrfs subvolume delete /backup/yourhost/ROOT/2010-03-10T00:00:00
+-------------
+
+=== Expire old backup automatically ===
+
+Use "btr-backup-clean" to clenup old backup automatically.
+
+-------------
+ btr-backup-clean /backup/*/*
+-------------
+
+This is cleanup all backups in default keep limit (keep 2 yearly, 6 monthly, 6 weekly and 7 daily backups).
+
+To sure witch directories will be keeped or deleted, run with *--no-act* and *--verbose* option.
+
+-------------
+ btr-backup-clean --no-act --verbose /backup/*/*
+-------------
+
+To change expire limit, add --keep option. For example 1 monthly, 3 weekly and 7 daily backups;
+
+-------------
+ btr-backup-clean --keep 0Y1M3W7D /backup/*/*
+-------------
+
+And you can change limit for each host by tuning argument path;
+
+-------------
+ btr-backup-clean --keep 0Y1M3W7D /backup/hostshort/*
+ btr-backup-clean --keep 0Y0M0W365D /backup/hostdaily/*
+-------------
+
+== Tips ==
+
+  * If you need to add ssh options, you can use RSYNC_RSH environment variable or -e option.
+  * ionice is usefull to reduce backup priority.
+    ** For remote host, use rsync option like; --rsync-path="ionice -c3 rsync"
+
+== Credits ==
+
+License::
+	GPL v2 or later
+Author::
+	(C) 2010 Tatsuki Sugiura <sugi@nemui.org>
+
+
+// vim: set ft=asciidoc:
