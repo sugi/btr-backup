@@ -3,7 +3,7 @@ btr-backup - backup script on btrfs
 
 http://github.com/sugi/btr-backup
 
-btr-backup is a simple script to backup files on btrfs.
+btr-backup is a simple script to backup files on btrfs with rsync.
 btrfs is really usefull for incremental backup with its features cow, snapshot and compression.
 
 == Requirements ==
