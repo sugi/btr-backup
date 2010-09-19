@@ -1,4 +1,18 @@
 #!/bin/bash
+#
+# btr-backup: backup script on btrfs
+#
+# Usage: btr-backup <target_dir> [rsync-options]
+#
+# (C) 2010 Tatsuki Sugiura <sugi@nemui.org>, All rights reserved.
+# This is free software with ABSOLUTELY NO WARRANTY.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+
 set -e
 
 backup_base=/backup
