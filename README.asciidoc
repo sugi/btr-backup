@@ -4,7 +4,7 @@ btr-backup - backup script on btrfs
 http://github.com/sugi/btr-backup
 
 btr-backup is a simple script to backup files on btrfs.
-btrfs is really usefull for backup with features cow and compress.
+btrfs is really usefull for incremental backup with its features cow, snapshot and compression.
 
 == Requirements ==
 
@@ -12,7 +12,7 @@ btrfs is really usefull for backup with features cow and compress.
     ** btrfs v2.6.32 above
     ** "btrfs" command (from 2010-01-24 on git)
     ** rsync
-    ** ruby (for btrfs-clean)
+    ** ruby (for btr-backup-clean)
     ** (ssh for remote backup)
   * Backup target
     ** rsync
