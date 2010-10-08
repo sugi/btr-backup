@@ -70,7 +70,7 @@ fi
 
 logmsg "Run rsync with: -acSHXA --numeric-ids --del --log-file=${logfile} $@ ${target}/ ${dest}/cur/"
 rsync -acSHXA --numeric-ids --del --log-file=${logfile} \
-	"$@" "${target}/" "${dest}/cur/"
+	"$@" "${target}/" "${dest}/cur/" || true
 
 logstamp
 btrfs filesystem sync "${dest}/cur" >> $logfile
