@@ -45,10 +45,10 @@ logfile="${logdir}/${host}-${dest#_}.log"
 dest="${backup_base}/${host}/${dest#_}"
 
 function logstamp {
-  echo -n "`date '+%Y/%m/%d %H:%M:%S'` " >> $logfile
+  echo -n "`date '+%Y/%m/%d %H:%M:%S'` " >> "$logfile"
 }
 function logmsg {
-  echo "`date '+%Y/%m/%d %H:%M:%S'` $@" >> $logfile
+  echo "`date '+%Y/%m/%d %H:%M:%S'` $@" >> "$logfile"
 }
 
 if [ -d $logdir ]; then
@@ -65,7 +65,7 @@ fi
 
 if [ ! -d "${dest}/cur" ]; then
   logstamp
-  btrfs subvolume create "${dest}/cur" >> $logfile
+  btrfs subvolume create "${dest}/cur" >> "$logfile"
 fi
 
 logmsg "Run rsync with: -acSHXA --numeric-ids --del --log-file=${logfile} $@ ${target}/ ${dest}/cur/"
@@ -73,7 +73,7 @@ rsync -acSHXA --numeric-ids --del --log-file=${logfile} \
 	"$@" "${target}/" "${dest}/cur/" || true
 
 logstamp
-btrfs filesystem sync "${dest}/cur" >> $logfile
+btrfs filesystem sync "${dest}/cur" >> "$logfile"
 
 logstamp
-btrfs subvolume snapshot "${dest}/cur" "${dest}/$(date +%Y-%m-%dT%H:%M:%S)" >> $logfile
+btrfs subvolume snapshot "${dest}/cur" "${dest}/$(date +%Y-%m-%dT%H:%M:%S)" >> "$logfile"
