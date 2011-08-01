@@ -44,10 +44,10 @@ if [ -z "${target}" ]; then
   exit 255
 fi
 
-if (echo "${target}" | egrep -q "^rsync://[0-9a-zA-Z.-]+/"); then
-  host="${target#rsync://}"
+if [ "${target:0:8}" = "rsync://" ]; then
+  host="${target:8}"
   host="${host%%/*}"
-  dest="${target#rsync://}"
+  dest="${target:8}"
   dest="/${dest#*/}"
 elif (echo "${target}" | egrep -q "^[0-9a-zA-Z.-]+:"); then
   host=${target%%:*}
