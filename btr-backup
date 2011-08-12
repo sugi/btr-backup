@@ -21,14 +21,35 @@ default_rsync_opts="-acSHXA --numeric-ids --del"
 config_file=/etc/btr-backup.conf
 load_config_force=f
 
-getopts c: copt
-if [ "$copt" = "c" ]; then
-  if [ -z "$OPTARG" ]; then
-    echo "No config file path is specified with -c option." >&2
-    exit 255
-  fi
-  config_file="$OPTARG"
-  load_config_force=t
+
+function usage() {
+  echo "Usage: $0 [-c config_file] <target_dir> [rsync-options]"
+}
+
+if [ -z "$1" ]; then
+  usage
+  exit 1
+elif [ "${1:0:1}" = "-" ]; then
+  while getopts hc: copt; do
+    case "$copt" in
+      h)
+	usage
+	exit 0
+	;;
+      c)
+	if [ -z "$OPTARG" ]; then
+	  echo "No config file path is specified with -c option." >&2
+	  exit 255
+	fi
+	config_file="$OPTARG"
+	load_config_force=t
+	;;
+      *)
+	usage
+	exit 1
+	;;
+    esac
+  done
   shift $((OPTIND-1))
 fi
 
