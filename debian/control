@@ -1,0 +1,16 @@
+Source: btr-backup
+Section: admin
+Priority: extra
+Maintainer: Tatsuki Sugiura <sugi@nemui.org>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.2
+Homepage: http://github.com/sugi/btr-backup
+#Vcs-Git: git://git.debian.org/collab-maint/btr-backup.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/btr-backup.git;a=summary
+
+Package: btr-backup
+Architecture: all
+Depends: linux-image-3.0.0-1-amd64 | linux-image-2.6, btrfs-tools (>= 0.19+20100601-1), rsync, ruby, ${shlibs:Depends}, ${misc:Depends}
+Suggests: util-linux (>= 2.13)
+Description: Backup Utility with Btrfs
+ Simple backup script with Linux Btrfs

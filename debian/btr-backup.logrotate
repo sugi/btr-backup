@@ -1,0 +1,7 @@
+/var/log/btr-backup/*.log {
+	weekly
+	compress
+	rotate 5
+	missingok
+	nocreate
+}

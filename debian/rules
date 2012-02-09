@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+PKGDIR=`pwd`/debian/`dh_listpackages`
+
+binary:
+	dh --with quilt binary --before dh_install
+	dh_install
+	install -m755 btr-backup btr-backup-clean $(PKGDIR)/usr/sbin
+	install -m644 debian/btr-backup.conf $(PKGDIR)/etc
+	mkdir -p $(PKGDIR)/var/log/btr-backup
+	chgrp adm $(PKGDIR)/var/log/btr-backup
+	chmod 750 $(PKGDIR)/var/log/btr-backup
+	dh --with quilt binary --after dh_install
+
+%:
+	dh $@ 

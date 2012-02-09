@@ -1,0 +1,31 @@
+This work was packaged for Debian by:
+
+    Tatsuki Sugiura <sugi@nemui.org> on Mon, 04 Oct 2010 03:35:07 +0900
+
+It was downloaded from:
+
+    <http://github.com/sugi/btr-backup>
+
+Upstream Author:
+
+    Tatsuki Sugiura <sugi@nemui.org>
+
+Copyright:
+
+    [btr-backup]
+    Copyright(C) 2010 Tatsuki Sugiura <sugi@nemui.org>
+
+    [btr-backup-clean]
+    Copyright(C) 2003 Taku YASUI <tach@debian.or.jp>,
+    Copyright(C) 2010 Tatsuki Sugiura <sugi@nemui.org>
+
+License:
+
+    GPL2 (/usr/share/common-licenses/GPL-2)
+
+The Debian packaging is:
+
+    Copyright (C) 2010 Tatsuki Sugiura <sugi@nemui.org>
+
+and is licensed under the GPL version 3,
+see "/usr/share/common-licenses/GPL-3".

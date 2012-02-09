@@ -1,0 +1,32 @@
+btr-backup (0.0.20110801-0.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * New upstream release.
+  * Bump Standards-Version to 3.9.2
+
+ -- Taku YASUI <tach@debian.org>  Fri, 12 Aug 2011 16:49:42 +0900
+
+btr-backup (0.0.20101009-1) unstable; urgency=low
+
+  * New upstream (ignore rsync error)
+  * Update crontab for $PATH environment.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sat, 09 Oct 2010 04:11:07 +0900
+
+btr-backup (0.0.20100920-3) unstable; urgency=low
+
+  * Fix script path in crontab file.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Mon, 04 Oct 2010 04:36:24 +0900
+
+btr-backup (0.0.20100920-2) unstable; urgency=low
+
+  * Fix ionice dependency.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Mon, 04 Oct 2010 04:31:22 +0900
+
+btr-backup (0.0.20100920-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Mon, 04 Oct 2010 03:35:07 +0900
