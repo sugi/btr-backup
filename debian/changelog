@@ -1,3 +1,11 @@
+btr-backup (0.0.20120209-1) unstable; urgency=low
+
+  * New upstream.
+  * Improve option handling.
+  * Fix local root backup.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Thu, 09 Feb 2012 11:01:57 +0900
+
 btr-backup (0.0.20110801-0.1) unstable; urgency=low
 
   * Non-maintainer upload.
