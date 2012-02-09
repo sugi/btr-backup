@@ -57,13 +57,14 @@ if [ -f "$config_file" -o $load_config_force = t ]; then
   . "$config_file"
 fi
 
-target="${1%/}"
-shift
-
-if [ -z "${target}" ]; then
+if [ -z "${1}" ]; then
   echo "Usage: $0 [-c config_file] <target_dir> [rsync-options]" >&2
   exit 255
 fi
+
+target="${1%/}"
+shift
+
 
 if [ "${target:0:8}" = "rsync://" ]; then
   host="${target:8}"
