@@ -1,3 +1,10 @@
+btr-backup (0.0.20120209-2) unstable; urgency=low
+
+  * Update crontab sample.
+  * drop dependency for linux-kernel.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sun, 08 Jul 2012 03:17:01 +0900
+
 btr-backup (0.0.20120209-1) unstable; urgency=low
 
   * New upstream.

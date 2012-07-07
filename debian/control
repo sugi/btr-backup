@@ -10,7 +10,7 @@ Homepage: http://github.com/sugi/btr-backup
 
 Package: btr-backup
 Architecture: all
-Depends: linux-image-3.0.0-1-amd64 | linux-image-2.6, btrfs-tools (>= 0.19+20100601-1), rsync, ruby, ${shlibs:Depends}, ${misc:Depends}
+Depends: btrfs-tools (>= 0.19+20100601-1), rsync, ruby, ${shlibs:Depends}, ${misc:Depends}
 Suggests: util-linux (>= 2.13)
 Description: Backup Utility with Btrfs
  Simple backup script with Linux Btrfs
