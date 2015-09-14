@@ -110,10 +110,15 @@ if [ ! -d "${dest}/cur" ]; then
 fi
 
 logmsg "Run rsync with: ${default_rsync_opts} --log-file=${logfile} $@ ${target}/ ${dest}/cur/"
-rsync ${default_rsync_opts} --log-file=${logfile} "$@" "${target}/" "${dest}/cur/" || true
+set +e
+rsync ${default_rsync_opts} --log-file=${logfile} "$@" "${target}/" "${dest}/cur/"
+ret=$?
+set -e
 
 logstamp
 btrfs filesystem sync "${dest}/cur" >> "$logfile"
 
 logstamp
 btrfs subvolume snapshot "${dest}/cur" "${dest}/$(date +%Y-%m-%dT%H:%M:%S)" >> "$logfile"
+
+exit $ret
