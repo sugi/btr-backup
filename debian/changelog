@@ -1,7 +1,7 @@
 btr-backup (0.0.20150915-1) unstable; urgency=medium
 
   * btr-backup returns rsync exit status.
-  * btr-backup will abort on rsync fails.
+  * btr-backup will NOT abort even if rsync fails.
 
  -- Tatsuki Sugiura <sugi@nemui.org>  Tue, 15 Sep 2015 02:06:48 +0900
 
