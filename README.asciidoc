@@ -1,12 +1,12 @@
 btr-backup - backup script on btrfs
-=================================
+===================================
 
 http://github.com/sugi/btr-backup
 
 btr-backup is a simple script to backup files on btrfs with rsync.
 btrfs is really usefull for incremental backup with its features cow, snapshot and compression.
 
-== Requirements ==
+== Requirements
 
   * Backup host
     ** btrfs v2.6.32 above
@@ -18,7 +18,7 @@ btrfs is really usefull for incremental backup with its features cow, snapshot a
     ** rsync
     ** (sshd or rsyncd)
 
-== SYNOPSIS ==
+== SYNOPSIS
 
 -------------
 btr-backup <target_dir> [--rsync_options]
@@ -29,7 +29,7 @@ target_dir::
 rsync_options::
 	all arguments after *target_dir* will passed to rsync. (e.g. -x --exclude=/var/log)
 
-== Description ==
+== Description
 
 *btr-backup* create backup to */backup/TARGET_HOST/TARGET_DIR*. 
 Backup steps are;
@@ -40,7 +40,7 @@ Backup steps are;
 
 And backup process is logged into */var/log/btr-backup/*.
 
-== Example ==
+== Example
 
 Simple one. That backups /etc to /backup/myhost/etc/;
 
@@ -62,7 +62,7 @@ btr-backup /var --exclude="/cache/*" --exclude="/tmp/*"
 
 == Cleanup backup ==
 
-=== By Hand ===
+=== By Hand
 
 You can delete backup directory with "btrfs subvolume delete", like;
 
@@ -70,7 +70,7 @@ You can delete backup directory with "btrfs subvolume delete", like;
  btrfs subvolume delete /backup/yourhost/ROOT/2010-03-10T00:00:00
 -------------
 
-=== Expire old backup automatically ===
+=== Expire old backup automatically
 
 Use "btr-backup-clean" to clenup old backup automatically.
 
@@ -105,7 +105,7 @@ And you can change limit for each host by tuning argument path;
   * ionice is usefull to reduce backup priority.
     ** For remote host, use rsync option like; --rsync-path="ionice -c3 rsync"
 
-== Credits ==
+== Credits
 
 License::
 	GPL v2 or later
