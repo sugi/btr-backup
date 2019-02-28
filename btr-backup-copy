@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# btr-backup-copy - copy incremental backups between two btrfs filesystems on single host.
+#
+# Usage: btr-backup-copy <source-backup-dir> <dest-dir>
+#
+
+set -e
+
+src="$1"
+dest="$2"
+
+if [ -z "$dest" -o -z "$src" ]; then
+  echo "Usage: $0 <source-backup-dir> <dest-dir>" >&2
+  exit 1
+fi
+
+if [ ! -d "${src}/cur" ]; then
+  echo "Source $src seems not to be a backup dir. It has no 'cur' directory. Abort." >&2
+  exit 1
+fi
+
+for d in $(find "$src" -mindepth 1 -maxdepth 1 -type d | sort); do
+  if [ -d "${dest}/$(basename $d)" ]; then
+    echo "Dest dir already have snapshot ${dest}/$(basename $d). Check again, abort!" >&2
+    exit 2
+  fi
+done
+
+echo "Creating temp subvolume to copy..."
+mkdir -p "$dest"
+tmpdir="${dest}/bbctmp.${RANDOM}"
+btrfs subvolume create "$tmpdir"
+
+for s in $(find "$src" -mindepth 1 -maxdepth 1 -type d | sort); do
+  echo "Syncing from $s..."
+  rsync -aHXA --del --numeric-ids "$s/" "$tmpdir/"
+  btrfs filesystem sync "$tmpdir"
+  echo "Sync done. Creating snapshot as $(basename $s)..."
+  btrfs subvolume snapshot "$tmpdir" "${dest}/$(basename $s)"
+  echo "done"
+done
+
+echo "All backup sync has been finished. Cleaning up temp subvolume..."
+btrfs subvolume delete "$tmpdir"
+
+echo "OK, All done."
